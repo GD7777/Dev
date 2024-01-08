@@ -1,17 +1,26 @@
-#!bin/bash
-cd../
-echo stoping Batch Module...
-appHome = 'pwd'
-pid = $(PS - Aeflgrep 'pwd'|grep -v grep|awk '{print $2}')
-kill -9$pid
-[echo = $(PS-A)]
-echo removing nohup.out file...
-if[-f bin/nohup.out]
-then
-vm -vf bin/nohup.out
+#!/bin/bash
+
+echo "Stopping Batch Module..."
+appHome=$(pwd)
+pid=$(ps -ef | grep "$appHome" | grep -v grep | awk '{print $2}')
+
+if [ -n "$pid" ]; then
+  kill -9 "$pid"
 fi
-cd standalong|log|
-timeNow = '(date--date='now' + %y=%m-%d_%H)'
-cd ${appHome}/bin
-echo restarting Application.....
-nohup ./standalone.sh - bmanagement=127.0.0.1 -60.0.0 & sleep 5
+
+echo "Removing nohup.out file..."
+if [ -f "$appHome/bin/nohup.out" ]; then
+  rm -f "$appHome/bin/nohup.out"
+fi
+
+cd "$appHome/standalone/log"
+
+timeNow=$(date +"%y-%m-%d_%H-%M-%S")
+
+cd "$appHome/bin"
+
+echo "Restarting Application..."
+nohup ./standalone.sh -bmanagement=127.0.0.1 -b 0.0.0.0 > "$appHome/standalone/log/nohup_$timeNow.out" 2>&1 &
+sleep 5
+
+echo "Application restarted."
